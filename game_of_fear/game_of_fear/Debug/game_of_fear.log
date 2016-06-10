@@ -1,0 +1,6 @@
+﻿  main.cpp
+c:\users\nickolas\source\repos\game_of_fear\game_of_fear\game_of_fear\main.cpp(59): warning C4244: '=': conversion from 'DWORD' to 'WORD', possible loss of data
+c:\users\nickolas\source\repos\game_of_fear\game_of_fear\game_of_fear\main.cpp(62): warning C4244: '=': conversion from 'const wchar_t' to 'char', possible loss of data
+c:\users\nickolas\source\repos\game_of_fear\game_of_fear\game_of_fear\main.cpp(121): warning C4244: '/=': conversion from 'double' to 'int', possible loss of data
+c:\users\nickolas\source\repos\game_of_fear\game_of_fear\game_of_fear\main.cpp(106): warning C4101: 'msg': unreferenced local variable
+  game_of_fear.vcxproj -> C:\Users\Nickolas\Source\Repos\game_of_fear\game_of_fear\Debug\game_of_fear.exe

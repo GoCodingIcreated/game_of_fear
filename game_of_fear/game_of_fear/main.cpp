@@ -84,6 +84,7 @@ void __stdcall InitDialog(std::vector<std::wstring> &dialog) {
 
 void main()
 {
+	srand(time(NULL));
 	for (unsigned i = 0x41; i <= 0x5A; ++i) {
 		allKeys.push_back (i);
 	}
