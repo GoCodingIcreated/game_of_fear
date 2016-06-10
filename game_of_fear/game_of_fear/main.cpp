@@ -1,12 +1,13 @@
-#include <windows.h>
+п»ї#include <windows.h>
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <vector>
+#include "fadma.h"
 
 
 HWND g_HWND = NULL;
-std::vector<unsigned> allKeys = { 0x41, 0x5A };
+std::vector<unsigned> allKeys;
 
 template <class T>
 void logger(const T &str) {
@@ -29,21 +30,19 @@ BOOL CALLBACK EnumWindowsProcMy(HWND hwnd, LPARAM lParam)
 }
 
 BOOL _stdcall IsNothingPressed() {
-	//for (WORD key = 0x41; key <= 0x5A; ++key) {
-		//auto virtual_key = LOBYTE(VkKeyScan(key));
-		//if (GetAsyncKeyState(key) & (1 << 15)) {
-		if (GetAsyncKeyState(VK_END) & 1 << 15) {
-			//logger(key)
+	FOR_(i, 'A', 'Z' + 1) {
+		if (butdwn(i)) {
+			cout << char(i) << endl;
 			return FALSE;
 		}
-	//}
+	}
 	return TRUE;
 }
 
 
 
 BOOL __stdcall PrintLetter(const std::vector<std::wstring> &dialog, int &line, int &pos) {
-	
+
 	do {
 		if (line >= (int)dialog.size()) {
 			return FALSE;
@@ -53,19 +52,31 @@ BOOL __stdcall PrintLetter(const std::vector<std::wstring> &dialog, int &line, i
 			pos = 0;
 		}
 	} while (line >= (int)dialog.size() || pos >= (int)dialog[line].size());
+	bool shift = (dialog[line][pos] == '?');
 	INPUT input;
 
 	input.type = INPUT_KEYBOARD;
 	input.ki.wScan = input.ki.time = input.ki.dwExtraInfo = 0;
 
-	input.ki.wVk = LOBYTE(VkKeyScan(dialog[line][pos++]));
+	char c;
+	input.ki.wVk = LOBYTE(VkKeyScan(c = dialog[line][pos++]));
 	input.ki.dwFlags = 0;
 
-	SendInput(1, &input, sizeof(input));
+	if (shift) {
+		setpressbut_plus(VK_SHIFT, SendInput(1, &input, sizeof(input)));
+	}
+	else {
+		if (isalpha(c)) {
+			setpressbut(toupper(c));
+		}
+		else {
+			SendInput(1, &input, sizeof(input));
+		}
+	}
 	return TRUE;
 }
 
-// инициализируем строки диалога
+// ГЁГ­ГЁГ¶ГЁГ Г«ГЁГ§ГЁГ°ГіГҐГ¬ Г±ГІГ°Г®ГЄГЁ Г¤ГЁГ Г«Г®ГЈГ 
 void __stdcall InitDialog(std::vector<std::wstring> &dialog) {
 	dialog.resize(3);
 	dialog[0] = L"Hello, man. What is your name?\n";
@@ -75,10 +86,14 @@ void __stdcall InitDialog(std::vector<std::wstring> &dialog) {
 
 void main()
 {
+	
+	for (unsigned i = 0x41; i <= 0x5A; ++i) {
+		allKeys.push_back(i);
+	}
+
 	STARTUPINFO cif;
 	ZeroMemory(&cif, sizeof(STARTUPINFO));
 	PROCESS_INFORMATION pi;
-
 
 	if (CreateProcess(L"c:\\windows\\notepad.exe", NULL,
 		NULL, NULL, FALSE, NULL, NULL, NULL, &cif, &pi) == TRUE)
@@ -100,14 +115,19 @@ void main()
 				if (!PrintLetter(my_dialog, line, letter)) {
 					break;
 				}
-				Sleep(50 + rand() % 80); // небольшая задержка для придания реалистичности
+				if (rand() % 8 == 0) {
+					Sleep(500);
+				}
+				else {
+					Sleep(40 + rand() % 80); // Г­ГҐГЎГ®Г«ГјГёГ Гї Г§Г Г¤ГҐГ°Г¦ГЄГ  Г¤Г«Гї ГЇГ°ГЁГ¤Г Г­ГЁГї Г°ГҐГ Г«ГЁГ±ГІГЁГ·Г­Г®Г±ГІГЁ
+				}
 			}
 			else {
 				MessageBox(NULL, L"Dont do it!", L"My caption.", MB_ICONSTOP);
 				SetForegroundWindow(g_HWND);
 			}
 		}
-		Sleep(3000);				// подождать
-		TerminateProcess(pi.hProcess, NO_ERROR);	// убрать процесс
+		Sleep(3000);				// ГЇГ®Г¤Г®Г¦Г¤Г ГІГј
+		TerminateProcess(pi.hProcess, NO_ERROR);	// ГіГЎГ°Г ГІГј ГЇГ°Г®Г¶ГҐГ±Г±
 	}
 }
