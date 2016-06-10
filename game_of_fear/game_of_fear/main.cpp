@@ -30,9 +30,9 @@ BOOL CALLBACK EnumWindowsProcMy(HWND hwnd, LPARAM lParam)
 }
 
 BOOL _stdcall IsNothingPressed() {
-	FOR_(i, 'A', 'Z' + 1) {
-		if (butdwn(i)) {
-			cout << char(i) << endl;
+	FOR_ (i, 'A', 'Z'+1) {
+		if (butdwn (i)) {
+			cout << char (i) << endl;
 			return FALSE;
 		}
 	}
@@ -42,7 +42,7 @@ BOOL _stdcall IsNothingPressed() {
 
 
 BOOL __stdcall PrintLetter(const std::vector<std::wstring> &dialog, int &line, int &pos) {
-
+	
 	do {
 		if (line >= (int)dialog.size()) {
 			return FALSE;
@@ -63,13 +63,11 @@ BOOL __stdcall PrintLetter(const std::vector<std::wstring> &dialog, int &line, i
 	input.ki.dwFlags = 0;
 
 	if (shift) {
-		setpressbut_plus(VK_SHIFT, SendInput(1, &input, sizeof(input)));
-	}
-	else {
-		if (isalpha(c)) {
-			setpressbut(toupper(c));
-		}
-		else {
+		setpressbut_plus (VK_SHIFT, SendInput(1, &input, sizeof(input)));
+	} else {
+		if (isalpha (c)) {
+			setpressbut (toupper (c));
+		} else {
 			SendInput(1, &input, sizeof(input));
 		}
 	}
@@ -81,14 +79,13 @@ void __stdcall InitDialog(std::vector<std::wstring> &dialog) {
 	dialog.resize(3);
 	dialog[0] = L"Hello, man. What is your name?\n";
 	dialog[1] = L"\nDo you like cats?\n";
-	dialog[2] = L"\nDo you like dark?\n";
+	dialog[2] = L"\nDo you like darkness?\n";
 }
 
 void main()
 {
-	
 	for (unsigned i = 0x41; i <= 0x5A; ++i) {
-		allKeys.push_back(i);
+		allKeys.push_back (i);
 	}
 
 	STARTUPINFO cif;
@@ -115,11 +112,20 @@ void main()
 				if (!PrintLetter(my_dialog, line, letter)) {
 					break;
 				}
-				if (rand() % 8 == 0) {
-					Sleep(500);
+				int ms_to_sleep;
+				if (rand () % 8 == 0) {
+					ms_to_sleep = 500;
+				} else {
+					ms_to_sleep = 20 + rand() % 200; // íåáîëüøàÿ çàäåðæêà äëÿ ïðèäàíèÿ ðåàëèñòè÷íîñòè
 				}
-				else {
-					Sleep(40 + rand() % 80); // íåáîëüøàÿ çàäåðæêà äëÿ ïðèäàíèÿ ðåàëèñòè÷íîñòè
+				ms_to_sleep /= 1.6;
+				while (ms_to_sleep > 0) {
+					ms_to_sleep -= 10;
+					Sleep (10);
+					if (!IsNothingPressed ()) {
+						MessageBox(NULL, L"Dont do it!", L"My caption.", MB_ICONSTOP);
+						SetForegroundWindow(g_HWND);
+					}
 				}
 			}
 			else {
